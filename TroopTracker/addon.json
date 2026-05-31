@@ -1,0 +1,17 @@
+{
+    "legacy_addon_id": "",
+    "addon_id": "ObsidianSlicers/TroopTracker",
+    "title": "Troop Tracker",
+    "description": "Integrates Troop Tracker with XenForo to sync trooper data, forum users, groups, and related community features.",
+    "version_id": 1000010,
+    "version_string": "1.0.0",
+    "dev": "Obsidian Slicers",
+    "dev_url": "https://github.com/obsidianslicers",
+    "faq_url": "",
+    "support_url": "",
+    "extra_urls": [],
+    "require": {
+        "XF": [2020000, "XenForo 2.2.0+"]
+    },
+    "icon": ""
+}

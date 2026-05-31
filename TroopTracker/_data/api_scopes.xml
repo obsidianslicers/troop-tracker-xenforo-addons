@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<api_scopes>
+  <api_scope api_scope_id="upgrades:read"/>
+  <api_scope api_scope_id="usergroups:read"/>
+  <api_scope api_scope_id="smilie:read"/>
+</api_scopes>

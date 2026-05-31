@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<routes>
+  <route route_type="api" route_prefix="trooper-api"   controller="ObsidianSlicers\TroopTracker\Api\Controller\TrooperApi"/>
+  <route route_type="api" route_prefix="user-groups"   controller="ObsidianSlicers\TroopTracker\Api\Controller\UserGroups"/>
+  <route route_type="api" route_prefix="upgrade-stats" controller="ObsidianSlicers\TroopTracker\Api\Controller\UpgradeStats"/>
+  <route route_type="api" route_prefix="smilies"       controller="ObsidianSlicers\TroopTracker\Api\Controller\Smilies"/>
+</routes>
