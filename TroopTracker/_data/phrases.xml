@@ -1,6 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<phrases>
-  <phrase title="api_scope.upgrades_read" version_id="1000010" version_string="1.0.0"><![CDATA[View user upgrade and payment data]]></phrase>
-  <phrase title="api_scope.usergroups_read" version_id="1000010" version_string="1.0.0"><![CDATA[View user group membership data]]></phrase>
-  <phrase title="api_scope.smilie_read" version_id="1000010" version_string="1.0.0"><![CDATA[View forum smilies and categories]]></phrase>
-</phrases>
+<phrases/>
