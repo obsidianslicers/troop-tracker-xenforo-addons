@@ -130,4 +130,51 @@ class TrooperApi extends \XF\Api\Controller\AbstractController
     {
         return $this->actionReportPost($params);
     }
+
+    public function actionPostWatchThread(ParameterBag $params): ApiResultReply
+    {
+        $this->assertApiScope('thread:write');
+
+        $threadId       = $this->filter('thread_id', 'uint');
+        $emailSubscribe = $this->filter('email_subscribe', 'bool');
+
+        if (!$threadId) {
+            return $this->apiResult(['error' => 'thread_id is required.']);
+        }
+
+        $thread = $this->em()->find('XF:Thread', $threadId);
+        if (!$thread) {
+            return $this->apiResult(['error' => 'Thread not found.']);
+        }
+
+        $state = $emailSubscribe ? 'watch_email' : 'watch_no_email';
+
+        /** @var \XF\Repository\ThreadWatchRepository $repo */
+        $repo = $this->repository('XF:ThreadWatch');
+        $repo->setWatchState($thread, \XF::visitor(), $state);
+
+        return $this->apiResult(['success' => true, 'watching' => true, 'email_subscribe' => $emailSubscribe]);
+    }
+
+    public function actionDeleteWatchThread(ParameterBag $params): ApiResultReply
+    {
+        $this->assertApiScope('thread:write');
+
+        $threadId = $this->filter('thread_id', 'uint');
+
+        if (!$threadId) {
+            return $this->apiResult(['error' => 'thread_id is required.']);
+        }
+
+        $thread = $this->em()->find('XF:Thread', $threadId);
+        if (!$thread) {
+            return $this->apiResult(['error' => 'Thread not found.']);
+        }
+
+        /** @var \XF\Repository\ThreadWatchRepository $repo */
+        $repo = $this->repository('XF:ThreadWatch');
+        $repo->setWatchState($thread, \XF::visitor(), 'delete');
+
+        return $this->apiResult(['success' => true, 'watching' => false]);
+    }
 }
