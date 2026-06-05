@@ -1,7 +1,7 @@
 # Troop Tracker — XenForo Addon
 
 **Addon ID:** `ObsidianSlicers/TroopTracker`  
-**Version:** 1.0.0  
+**Version:** 1.1.0  
 **Developer:** [Obsidian Slicers](https://github.com/obsidianslicers)  
 **Requires:** XenForo 2.2.0+
 
@@ -31,10 +31,12 @@ ObsidianSlicers/TroopTracker/
 ├── Setup.php                           Install / upgrade / uninstall hooks
 │
 ├── Api/Controller/
-│   ├── Smilies.php                     GET /api/smilies/
-│   ├── TrooperApi.php                  GET /api/trooper-api/block-user
-│   │                                   GET /api/trooper-api/report-post
-│   ├── UpgradeStats.php                GET /api/upgrade-stats/
+│   ├── Smilies.php                     GET    /api/smilies/
+│   ├── TrooperApi.php                  GET    /api/trooper-api/block-user
+│   │                                   GET    /api/trooper-api/report-post
+│   │                                   POST   /api/trooper-api/watch-thread
+│   │                                   DELETE /api/trooper-api/watch-thread
+│   ├── UpgradeStats.php                GET    /api/upgrade-stats/
 │   │                                   GET /api/upgrade-stats/user
 │   └── UserGroups.php                  GET /api/user-groups/
 │
@@ -441,6 +443,100 @@ XF-Api-User: 1
 
 ---
 
+### POST `api/trooper-api/watch-thread`
+
+Watches a thread on behalf of the authenticated visitor.
+
+**Required scope:** `thread:write`  
+**Auth required:** `XF-Api-Key` + `XF-Api-User`
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|---|---|---|---|
+| `thread_id` | integer | Yes | ID of the thread to watch |
+| `email_subscribe` | bool | No | Receive email notifications (default `false`) |
+
+**Example:**
+```
+POST http://localhost:8888/forum/index.php?api/trooper-api/watch-thread
+```
+Headers:
+```
+XF-Api-Key: YOUR_API_KEY
+XF-Api-User: 1
+```
+Body:
+```
+thread_id=42&email_subscribe=0
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "watching": true,
+  "email_subscribe": false
+}
+```
+
+**Error responses:**
+
+| Reason |
+|---|
+| `thread_id` not provided |
+| Thread not found |
+| Not logged in |
+| Token missing `thread:write` scope |
+
+---
+
+### DELETE `api/trooper-api/watch-thread`
+
+Unwatches a thread on behalf of the authenticated visitor. Safe to call even if the thread is not currently watched.
+
+**Required scope:** `thread:write`  
+**Auth required:** `XF-Api-Key` + `XF-Api-User`
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|---|---|---|---|
+| `thread_id` | integer | Yes | ID of the thread to unwatch |
+
+**Example:**
+```
+DELETE http://localhost:8888/forum/index.php?api/trooper-api/watch-thread
+```
+Headers:
+```
+XF-Api-Key: YOUR_API_KEY
+XF-Api-User: 1
+```
+Body:
+```
+thread_id=42
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "watching": false
+}
+```
+
+**Error responses:**
+
+| Reason |
+|---|
+| `thread_id` not provided |
+| Thread not found |
+| Not logged in |
+| Token missing `thread:write` scope |
+
+---
+
 ## Class Extensions
 
 These run automatically once the addon is installed — no configuration needed.
@@ -465,7 +561,7 @@ Scopes are defined in `_data/api_scopes.xml` and visible under **Admin > Develop
 | `usergroups:read` | `UserGroups` controller | View user group membership |
 | `smilie:read` | `Smilies` controller | View smilies and categories |
 
-The `trooper-api` endpoints (`block-user`, `report-post`) do not use a scope — they use visitor session authentication instead.
+The `trooper-api` endpoints (`block-user`, `report-post`) do not use a scope — they use visitor session authentication instead. The `watch-thread` endpoints require the `thread:write` scope.
 
 ---
 
