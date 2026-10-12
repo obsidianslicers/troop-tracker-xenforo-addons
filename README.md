@@ -1,7 +1,7 @@
 # Troop Tracker — XenForo Addon
 
 **Addon ID:** `ObsidianSlicers/TroopTracker`  
-**Version:** 1.1.0  
+**Version:** 1.2.0  
 **Developer:** [Obsidian Slicers](https://github.com/obsidianslicers)  
 **Requires:** XenForo 2.2.0+
 
@@ -220,7 +220,7 @@ http://localhost:8888/forum/index.php?api/smilies
 
 ### GET `api/user-groups`
 
-Returns all user groups (primary and secondary) that a given user belongs to.
+Returns all user groups (primary and secondary) that a given user belongs to. When `user_id` is omitted, returns every user group on the forum (since 1.2.0).
 
 **Required scope:** `usergroups:read`  
 **Auth required:** API key only
@@ -229,7 +229,7 @@ Returns all user groups (primary and secondary) that a given user belongs to.
 
 | Param | Type | Required | Description |
 |---|---|---|---|
-| `user_id` | integer | Yes | XenForo user ID |
+| `user_id` | integer | No | XenForo user ID. Omit to list every user group. |
 
 **Example:**
 ```
@@ -259,11 +259,20 @@ http://localhost:8888/forum/index.php?api/user-groups&user_id=1
 }
 ```
 
+**Response (no `user_id`):**
+```json
+{
+  "userGroups": [
+    { "groupID": 3, "title": "501st Member" },
+    { "groupID": 7, "title": "Garrison Staff" }
+  ]
+}
+```
+
 **Error responses:**
 
 | Status | Reason |
 |---|---|
-| 400 | `user_id` not provided |
 | 404 | User not found |
 
 ---

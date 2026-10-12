@@ -13,13 +13,15 @@ class UserGroups extends AbstractController
 
         $userId = $this->filter('user_id', 'uint');
 
-        if (!$userId)
-        {
-            return $this->apiError('A valid user_id is required.', 'invalid_user_id', [], 400);
-        }
-
         /** @var \ObsidianSlicers\TroopTracker\Repository\UserGroups $repo */
         $repo = $this->repository('ObsidianSlicers\TroopTracker:UserGroups');
+
+        if (!$userId)
+        {
+            return $this->apiResult([
+                'userGroups' => $repo->getAllUserGroups(),
+            ]);
+        }
 
         $groups = $repo->getUserGroups($userId);
 

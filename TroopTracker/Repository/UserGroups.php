@@ -6,6 +6,26 @@ use XF\Mvc\Entity\Repository;
 
 class UserGroups extends Repository
 {
+    public function getAllUserGroups(): array
+    {
+        $groups = $this->db()->fetchAll("
+            SELECT user_group_id, title
+            FROM xf_user_group
+            ORDER BY title
+        ");
+
+        $result = [];
+        foreach ($groups as $group)
+        {
+            $result[] = [
+                'groupID' => (int) $group['user_group_id'],
+                'title'   => $group['title'],
+            ];
+        }
+
+        return $result;
+    }
+
     public function getUserGroups(int $userId): array
     {
         $user = $this->db()->fetchRow("
