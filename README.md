@@ -63,10 +63,10 @@ ObsidianSlicers/TroopTracker/
 
 ### Option A — Admin Panel (recommended for production)
 
-1. Zip the `ObsidianSlicers/TroopTracker` directory.
+1. Use the release zip from `TroopTracker/_releases/` (e.g. `ObsidianSlicers-TroopTracker-1.2.0.zip`). A plain zip of the add-on folder is rejected as "not a valid add-on": XenForo requires the files under `upload/src/addons/ObsidianSlicers/TroopTracker/` with a `hashes.json`. Build the release with `php cmd.php xf-addon:build-release ObsidianSlicers/TroopTracker`.
 2. Log in to **XenForo Admin Panel**.
-3. Go to **Admin > Add-ons > Install/Upgrade**.
-4. Upload the zip and click **Install**.
+3. Go to **Admin > Add-ons > Install/Upgrade from archive**.
+4. Upload the zip and click **Install** or **Upgrade**.
 5. Proceed to [Registering Routes](#registering-routes).
 
 ### Option B — CLI (recommended for development)
