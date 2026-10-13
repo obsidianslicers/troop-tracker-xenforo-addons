@@ -263,8 +263,8 @@ http://localhost:8888/forum/index.php?api/user-groups&user_id=1
 ```json
 {
   "userGroups": [
-    { "groupID": 3, "title": "501st Member" },
-    { "groupID": 7, "title": "Garrison Staff" }
+    { "groupID": 3, "title": "501st Member", "bannerText": "Stormtrooper" },
+    { "groupID": 7, "title": "Garrison Staff", "bannerText": "<img src=\"data/assets/staff.png\" />" }
   ]
 }
 ```

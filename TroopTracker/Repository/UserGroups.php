@@ -9,7 +9,7 @@ class UserGroups extends Repository
     public function getAllUserGroups(): array
     {
         $groups = $this->db()->fetchAll("
-            SELECT user_group_id, title
+            SELECT user_group_id, title, banner_text
             FROM xf_user_group
             ORDER BY title
         ");
@@ -18,8 +18,9 @@ class UserGroups extends Repository
         foreach ($groups as $group)
         {
             $result[] = [
-                'groupID' => (int) $group['user_group_id'],
-                'title'   => $group['title'],
+                'groupID'    => (int) $group['user_group_id'],
+                'title'      => $group['title'],
+                'bannerText' => $group['banner_text'],
             ];
         }
 
