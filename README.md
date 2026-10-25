@@ -1,7 +1,7 @@
 # Troop Tracker — XenForo Addon
 
 **Addon ID:** `ObsidianSlicers/TroopTracker`  
-**Version:** 1.2.0  
+**Version:** 1.3.0  
 **Developer:** [Obsidian Slicers](https://github.com/obsidianslicers)  
 **Requires:** XenForo 2.2.0+
 
@@ -38,10 +38,12 @@ ObsidianSlicers/TroopTracker/
 │   │                                   DELETE /api/trooper-api/watch-thread
 │   ├── UpgradeStats.php                GET    /api/upgrade-stats/
 │   │                                   GET /api/upgrade-stats/user
+│   ├── SystemHealth.php                GET /api/system-health/
 │   └── UserGroups.php                  GET /api/user-groups/
 │
 ├── Repository/
 │   ├── UpgradeStats.php                DB queries for upgrade/donation data
+│   ├── SystemHealth.php                Server, permission and payment health
 │   └── UserGroups.php                  DB queries for user group membership
 │
 ├── XF/Entity/
@@ -51,7 +53,7 @@ ObsidianSlicers/TroopTracker/
 │   └── Attachment.php                  Class extension — bypasses permission check for images
 │
 └── _data/
-    ├── routes.xml                      All 4 API route definitions
+    ├── routes.xml                      All 5 API route definitions
     ├── api_scopes.xml                  upgrades:read, usergroups:read, smilie:read
     ├── class_extensions.xml            XF\Entity\User + XF\Pub\Controller\Attachment
     └── phrases.xml                     Display labels for the 3 API scopes
@@ -141,6 +143,17 @@ Fill in **only** these fields for each route. Leave all others blank.
 
 ---
 
+### Route 5 — System Health
+
+| Field | Value |
+|---|---|
+| Route type | `API` |
+| Route prefix | `system-health` |
+| Controller | `ObsidianSlicers\TroopTracker\Api\Controller\SystemHealth` |
+| Add-on | `ObsidianSlicers/TroopTracker` |
+
+---
+
 ## API Key Setup
 
 All endpoints require an API key passed in the request header.
@@ -151,6 +164,7 @@ All endpoints require an API key passed in the request header.
    - `upgrades:read` — for upgrade stats endpoints
    - `usergroups:read` — for user groups endpoint
    - `smilie:read` — for smilies endpoint
+   - `system:read` — for system health endpoint (Troop Tracker System Check)
 4. Save and copy the generated key.
 
 Pass the key on every request:
@@ -355,6 +369,68 @@ http://localhost:8888/forum/index.php?api/upgrade-stats/user&user_id=1
 | Status | Reason |
 |---|---|
 | 400 | `user_id` not provided |
+
+---
+
+### GET `api/system-health`
+
+Returns forum server health used by the Troop Tracker admin **System Check** page (since 1.3.0). Lets Troop Tracker check the forum even when it runs on a different server.
+
+**Required scope:** `system:read`  
+**Auth required:** API key only
+
+**Example:**
+```
+http://localhost:8888/forum/index.php?api/system-health
+```
+
+**Response:**
+```json
+{
+  "xenforo": {
+    "version_id": 2030770,
+    "version_string": "2.3.7",
+    "addon_version_id": 1030000,
+    "pending_upgrades": []
+  },
+  "php": {
+    "version": "8.5.0",
+    "sapi": "apache2handler",
+    "extensions": { "mbstring": true, "gd": true, "imagick": true, "...": true },
+    "ini": { "upload_max_filesize": "100M", "post_max_size": "256M", "memory_limit": "512M", "...": "" }
+  },
+  "server": {
+    "software": "Apache/2.4.62 (Debian)",
+    "apache_modules": ["mod_rewrite", "..."],
+    "disk_free": 21474836480,
+    "disk_total": 85899345920
+  },
+  "paths": {
+    "internal_data": { "exists": true, "writable": true, "perms": "0755", "world_writable": false },
+    "data": { "...": "..." },
+    "js": { "...": "..." },
+    "src/addons": { "...": "..." },
+    "styles": { "...": "..." },
+    "internal_data/attachments": { "...": "..." }
+  },
+  "attachments": { "max_file_size_kb": 102400, "max_dimension": 2560, "image_library": "imPecl" },
+  "payments": {
+    "active_profiles": 1,
+    "error_days": 30,
+    "errors": { "Request not validated": 2, "Unknown payment profile": 1 },
+    "provider_data_tables": ["xf_purchase_request"],
+    "provider_data_errors": 0
+  }
+}
+```
+
+| Key | Description |
+|---|---|
+| `xenforo.pending_upgrades` | Installed add-ons (including `XF`) whose files are newer than the database. Missing columns usually mean an upgrade is pending |
+| `paths` | Permissions for `internal_data`, `data` (and their immediate subdirectories), `js`, `src/addons` and `styles` |
+| `payments.errors` | `xf_payment_provider_log` error rows from the last `error_days` days, grouped by message |
+| `payments.provider_data_tables` | `xf_*` tables that have a `provider_data` column |
+| `payments.provider_data_errors` | `xf_error_log` entries mentioning `provider_data` in the last `error_days` days |
 
 ---
 
@@ -569,6 +645,7 @@ Scopes are defined in `_data/api_scopes.xml` and visible under **Admin > Develop
 | `upgrades:read` | `UpgradeStats` controller | View upgrade and payment data |
 | `usergroups:read` | `UserGroups` controller | View user group membership |
 | `smilie:read` | `Smilies` controller | View smilies and categories |
+| `system:read` | `SystemHealth` controller | View server, permission and payment health |
 
 The `trooper-api` endpoints (`block-user`, `report-post`) do not use a scope — they use visitor session authentication instead. The `watch-thread` endpoints require the `thread:write` scope.
 
