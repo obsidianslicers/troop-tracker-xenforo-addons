@@ -1,11 +1,11 @@
 # Troop Tracker — XenForo Addon
 
 **Addon ID:** `ObsidianSlicers/TroopTracker`  
-**Version:** 1.2.0  
+**Version:** 1.2.1  
 **Developer:** [Obsidian Slicers](https://github.com/obsidianslicers)  
 **Requires:** XenForo 2.2.0+
 
-Custom XenForo addon for the Troop Tracking Xenforo integration. Exposes API endpoints for user groups, upgrade/donation stats, smilies, and mobile user actions (block, report), plus a class extension that allows guests to view image attachments.
+Custom XenForo addon for the Troop Tracking Xenforo integration. Exposes API endpoints for user groups, upgrade/donation stats, smilies, and mobile user actions (block, report).
 
 ---
 
@@ -16,9 +16,8 @@ Custom XenForo addon for the Troop Tracking Xenforo integration. Exposes API end
 3. [Registering Routes](#registering-routes)
 4. [API Key Setup](#api-key-setup)
 5. [Endpoints Reference](#endpoints-reference)
-6. [Class Extensions](#class-extensions)
-7. [API Scopes](#api-scopes)
-8. [Development — CLI Commands](#development--cli-commands)
+6. [API Scopes](#api-scopes)
+7. [Development — CLI Commands](#development--cli-commands)
 
 ---
 
@@ -44,16 +43,9 @@ ObsidianSlicers/TroopTracker/
 │   ├── UpgradeStats.php                DB queries for upgrade/donation data
 │   └── UserGroups.php                  DB queries for user group membership
 │
-├── XF/Entity/
-│   └── User.php                        Class extension — grants guests attachment access
-│
-├── XF/Pub/Controller/
-│   └── Attachment.php                  Class extension — bypasses permission check for images
-│
 └── _data/
     ├── routes.xml                      All 4 API route definitions
     ├── api_scopes.xml                  upgrades:read, usergroups:read, smilie:read
-    ├── class_extensions.xml            XF\Entity\User + XF\Pub\Controller\Attachment
     └── phrases.xml                     Display labels for the 3 API scopes
 ```
 
@@ -63,11 +55,18 @@ ObsidianSlicers/TroopTracker/
 
 ### Option A — Admin Panel (recommended for production)
 
-1. Use the release zip from `TroopTracker/_releases/` (e.g. `ObsidianSlicers-TroopTracker-1.2.0.zip`). A plain zip of the add-on folder is rejected as "not a valid add-on": XenForo requires the files under `upload/src/addons/ObsidianSlicers/TroopTracker/` with a `hashes.json`. Build the release with `php cmd.php xf-addon:build-release ObsidianSlicers/TroopTracker`.
+1. Use the release zip from `TroopTracker/_releases/` (e.g. `ObsidianSlicers-TroopTracker-1.2.1.zip`). A plain zip of the add-on folder is rejected as "not a valid add-on": XenForo requires the files under `upload/src/addons/ObsidianSlicers/TroopTracker/` with a `hashes.json`. Build the release with `php cmd.php xf-addon:build-release ObsidianSlicers/TroopTracker`.
 2. Log in to **XenForo Admin Panel**.
 3. Go to **Admin > Add-ons > Install/Upgrade from archive**.
 4. Upload the zip and click **Install** or **Upgrade**.
 5. Proceed to [Registering Routes](#registering-routes).
+
+### Upgrading from 1.2.0 or earlier
+
+1.2.1 no longer changes how XenForo checks attachment or user permissions; stock XenForo rules apply. After upgrading:
+
+1. Delete the leftover `src/addons/ObsidianSlicers/TroopTracker/XF/` folder on the server. XenForo does not remove files dropped from an add-on.
+2. If the older `TroopTrackerViewAttachment` add-on is installed, uninstall it. Troop Tracker loads forum attachments through the API key, so it is no longer needed.
 
 ### Option B — CLI (recommended for development)
 
@@ -543,20 +542,6 @@ thread_id=42
 | Thread not found |
 | Not logged in |
 | Token missing `thread:write` scope |
-
----
-
-## Class Extensions
-
-These run automatically once the addon is installed — no configuration needed.
-
-### `XF\Entity\User` → `ObsidianSlicers\TroopTracker\XF\Entity\User`
-
-Overrides `hasPermission()`. When a guest (`user_id == 0`) accesses a URL containing `index.php?attachments`, permission checks return `true`, allowing image viewing without an account. All other permission checks fall through to XenForo's standard logic.
-
-### `XF\Pub\Controller\Attachment` → `ObsidianSlicers\TroopTracker\XF\Pub\Controller\Attachment`
-
-Overrides `actionIndex()`. For image file types (`jpg`, `jpeg`, `png`, `gif`, `webp`) the `canView()` permission check is skipped entirely — the file is served directly. For all other file types (zip, pdf, etc.) the standard permission check is enforced. Temporary-hash attachments (freshly uploaded, not yet associated with a post) always require the correct hash regardless of file type.
 
 ---
 
